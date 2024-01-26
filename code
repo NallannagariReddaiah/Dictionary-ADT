@@ -1,0 +1,238 @@
+typedef struct node
+{
+        char name[50];
+        void *data;
+}dict_node;
+typedef struct
+{
+	int count;
+	dict_node* head[100];
+}Dict;
+void insert_dict_with_key(Dict **dict,char name[],void *data)
+{
+    if((*dict)==NULL)
+    {
+        printf("Dictionary not created yet please create the dictionay\n");
+        return;
+    }
+    else
+    {
+        int i=0,j;
+		dict_node *New_node;
+		New_node=(dict_node *)malloc(sizeof(dict_node));
+        strcpy(New_node->name,name);
+        New_node->data=data;
+        if((*dict)->count==-1)
+        {
+            ((*dict)->count)++;
+            (*dict)->head[(*dict)->count]=New_node;
+        }
+        else
+        {
+            while(i<=(*dict)->count&&strcmp(((*dict)->head[i])->name,name)<0)
+            {
+                i++;
+            }
+            for(j=(*dict)->count;j>=i;j--)
+            {
+                (*dict)->head[j+1]=(*dict)->head[j];
+            }
+            (*dict)->head[i]=New_node;
+            ((*dict)->count)++;
+        }
+    }
+}
+Dict *create_dict(void)
+{
+		Dict *New_dict;
+        New_dict=(Dict *)malloc(sizeof(Dict));
+        if(New_dict)
+        {
+        	New_dict->count=-1;
+    	}
+        return New_dict;
+}
+void *search_dict_with_key(Dict *dict,char name[])
+{
+      if( dict==NULL)
+      {
+          return NULL;
+      }
+      else if(dict->count==-1)
+      {
+          return NULL;
+      }
+      else
+      {
+	        int l=0,h=dict->count,mid;
+	        while(l<=h)
+            {
+                mid=(l+h)/2;
+                if(strcmp(dict->head[mid]->name,name)==0)
+                {
+                    return dict->head[mid]->data;
+                }
+                else if(strcmp(dict->head[mid]->name,name)<0)
+                {
+                    l=mid+1;
+                }
+                else if(strcmp(dict->head[mid]->name,name)>0)
+                {
+                    h=mid-1;
+                }
+            }
+            return NULL;
+      }
+}
+void delete_from_dict_given_key(Dict **dict,char name[])
+{
+	if((*dict)==NULL)
+	{
+	    printf("Dictionary is not created yet first create dictionary");
+	    return;
+	}
+	else
+	{
+	    if((*dict)->count==-1)
+        {
+            printf("Dictionary is empty");
+            return;
+        }
+            int l=0,h=(*dict)->count,mid,i;
+	        while(l<=h)
+            {
+                mid=(l+h)/2;
+                if(strcmp((*dict)->head[mid]->name,name)==0)
+                {
+                    break;
+                }
+                else if(strcmp((*dict)->head[mid]->name,name)<0)
+                {
+                    l=mid+1;
+                }
+                else if(strcmp((*dict)->head[mid]->name,name)>0)
+                {
+                    h=mid-1;
+                }
+            }
+            if(strcmp((*dict)->head[mid]->name,name)==0)
+            {
+                for(i=mid;i<(*dict)->count;i++)
+                {
+                    (*dict)->head[i]=(*dict)->head[i+1];
+                }
+                ((*dict)->count)--;
+            }
+            else
+            {
+                printf("Searched element not found\n");
+            }
+    }
+}
+void update_dict_given_key(Dict **dict,char name[],void *data)
+{
+    if((*dict)==NULL)
+    {
+        printf("Dictionary not created yet");
+        return;
+    }
+    if((*dict)->count==-1)
+    {
+        printf("Dictionary is empty");
+    }
+        int l=0,h=(*dict)->count,mid,i;
+	        while(l<=h)
+            {
+                mid=(l+h)/2;
+                if(strcmp((*dict)->head[mid]->name,name)==0)
+                {
+                    break;
+                }
+                else if(strcmp((*dict)->head[mid]->name,name)<0)
+                {
+                    l=mid+1;
+                }
+                else if(strcmp((*dict)->head[mid]->name,name)>0)
+                {
+                    h=mid-1;
+                }
+            }
+            if(strcmp((*dict)->head[mid]->name,name)==0)
+            {
+                (*dict)->head[mid]->data=data;
+            }
+            else
+            {
+                printf("Unable to find the specified name");
+            }
+}
+Dict *Merge_two_dict(Dict *dict1,Dict *dict2)
+{
+    if(dict1==NULL||dict1->count==-1)
+    {
+        return dict2;
+    }
+    else if(dict2==NULL||dict2->count==-1)
+    {
+        return dict1;
+    }
+    else
+    {
+	    int i=0,j=0;
+	    Dict *dict;
+	    dict=create_dict();
+	    while(i<=dict1->count&&j<=dict2->count)
+        {
+            if(strcmp(dict1->head[i]->name,dict2->head[j]->name)>0)
+            {
+                insert_dict_with_key(&dict,dict1->head[j]->name,dict1->head[j]->data);
+                j++;
+            }
+            else if(strcmp(dict1->head[i]->name,dict2->head[j]->name)<0)
+            {
+                insert_dict_with_key(&dict,dict1->head[i]->name,dict1->head[i]->data);
+                i++;
+            }
+            else
+            {
+                insert_dict_with_key(&dict,dict1->head[i]->name,dict1->head[i]->data);
+                insert_dict_with_key(&dict,dict1->head[j]->name,dict1->head[j]->data);
+                i++;
+                j++;
+            }
+        }
+        while(i<=dict1->count)
+        {
+            insert_dict_with_key(&dict,dict1->head[i]->name,dict1->head[i]->data);
+            i++;
+        }
+        while(j<=dict1->count)
+        {
+            insert_dict_with_key(&dict,dict1->head[j]->name,dict1->head[j]->data);
+            j++;
+        }
+	    return dict;
+    }
+}
+void destroy_dict(Dict **dict)
+{
+    if((*dict)==NULL)
+    {
+        return;
+    }
+    if((*dict)->count==-1)
+    {
+        return;
+    }
+    else
+    {
+	   int i=0;
+	   while(i<=(*dict)->count)
+       {
+           free((*dict)->head[i]->data);
+           i++;
+       }
+	    free(*dict);
+	    (*dict)=NULL;
+    }
+}
